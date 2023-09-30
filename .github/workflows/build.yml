@@ -28,6 +28,8 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+    - name: Make gradlew executable
+      run: chmod 777 gradlew
     - name: Setup project
       run: ./gradlew applyPatches
     - name: Build project to paperclip jar
