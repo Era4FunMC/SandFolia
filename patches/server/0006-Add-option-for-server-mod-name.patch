@@ -1,0 +1,71 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: wangxyper <wangxyper@163.com>
+Date: Sat, 30 Sep 2023 08:50:34 +0800
+Subject: [PATCH] Add option for server mod name
+
+
+diff --git a/src/main/java/com/destroystokyo/paper/network/PaperServerListPingEventImpl.java b/src/main/java/com/destroystokyo/paper/network/PaperServerListPingEventImpl.java
+index 5d7110a33957a597592cacb864c947eb053e8563..1043ef6fcc8d05a520941b6dc7a5681a7e62eb2d 100644
+--- a/src/main/java/com/destroystokyo/paper/network/PaperServerListPingEventImpl.java
++++ b/src/main/java/com/destroystokyo/paper/network/PaperServerListPingEventImpl.java
+@@ -5,6 +5,7 @@ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.server.level.ServerPlayer;
+ import org.bukkit.entity.Player;
+ import org.bukkit.util.CachedServerIcon;
++import org.era4funmc.sandfolia.SandFoliaConfig;
+ 
+ import javax.annotation.Nullable;
+ 
+@@ -14,7 +15,7 @@ class PaperServerListPingEventImpl extends PaperServerListPingEvent {
+ 
+     PaperServerListPingEventImpl(MinecraftServer server, StatusClient client, int protocolVersion, @Nullable CachedServerIcon icon) {
+         super(client, server.server.motd(), server.getPlayerCount(), server.getMaxPlayers(),
+-                server.getServerModName() + ' ' + server.getServerVersion(), protocolVersion, icon);
++                SandFoliaConfig.fakeVanillaMode ? server.getServerVersion() : server.getServerModName() + ' ' + server.getServerVersion(), protocolVersion, icon); //SandFolia
+         this.server = server;
+     }
+ 
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 8cb67609c58a5bee506835e5fa88c12e7e4de97c..b9a20b958899d4b06decf8c85a9c1cdba733b178 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -156,6 +156,7 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
+ import net.minecraft.world.level.storage.ServerLevelData;
+ import net.minecraft.world.level.storage.WorldData;
+ import net.minecraft.world.level.storage.loot.LootDataManager;
++import org.era4funmc.sandfolia.SandFoliaConfig;
+ import org.slf4j.Logger;
+ import org.era4funmc.sandfolia.threadedregioncontroller.RegionTickHolder;
+ // CraftBukkit start
+@@ -1804,7 +1805,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+ 
+     @DontObfuscate
+     public String getServerModName() {
+-        return "SandFolia"; //SandFolia - SandFolia > // Folia - Folia > // Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
++        return SandFoliaConfig.fakeVanillaMode ? "vanilla" : SandFoliaConfig.serverBrandName; //SandFolia - SandFolia > // Folia - Folia > // Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
+     }
+ 
+     public SystemReport fillSystemReport(SystemReport details) {
+diff --git a/src/main/java/org/era4funmc/sandfolia/SandFoliaConfig.java b/src/main/java/org/era4funmc/sandfolia/SandFoliaConfig.java
+index af974e5593fbfdfde8e81fa5208e6531f660c9bc..2b7182e8d2a0466225696cf04a69942fc4dfeea2 100644
+--- a/src/main/java/org/era4funmc/sandfolia/SandFoliaConfig.java
++++ b/src/main/java/org/era4funmc/sandfolia/SandFoliaConfig.java
+@@ -13,6 +13,8 @@ public class SandFoliaConfig {
+     //All values
+ 
+     //Gameplay
++    public static boolean fakeVanillaMode = false;
++    public static String serverBrandName = "SandFolia";
+     //
+ 
+     private static final YamlConfiguration configEntry = new YamlConfiguration();
+@@ -21,7 +23,8 @@ public class SandFoliaConfig {
+ 
+ 
+     public static void loadAllValues(){
+-
++        serverBrandName = getString("gameplay.server_brand_name",serverBrandName);
++        fakeVanillaMode = getBoolean("gameplay.fake_vanilla_mode",fakeVanillaMode);
+         save();
+     }
+ 

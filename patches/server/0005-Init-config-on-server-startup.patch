@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: wangxyper <wangxyper@163.com>
+Date: Sat, 30 Sep 2023 08:49:58 +0800
+Subject: [PATCH] Init config on server startup
+
+
+diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+index c5dfd99a38a79fd19a2bf85fa297a28e40612b51..83dd1c66601405ef33a86ed4226fb4dada4c49e7 100644
+--- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -50,6 +50,7 @@ import net.minecraft.world.level.GameRules;
+ import net.minecraft.world.level.GameType;
+ import net.minecraft.world.level.block.entity.SkullBlockEntity;
+ import net.minecraft.world.level.storage.LevelStorageSource;
++import org.era4funmc.sandfolia.SandFoliaConfig;
+ import org.slf4j.Logger;
+ 
+ // CraftBukkit start
+@@ -204,6 +205,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         org.spigotmc.SpigotConfig.init((java.io.File) options.valueOf("spigot-settings"));
+         org.spigotmc.SpigotConfig.registerCommands();
+         // Spigot end
++        SandFoliaConfig.init(); // SandFolia
+         // Paper start
+         io.papermc.paper.util.ObfHelper.INSTANCE.getClass(); // Paper - load mappings for stacktrace deobf and etc.
+         paperConfigurations.initializeGlobalConfiguration();
