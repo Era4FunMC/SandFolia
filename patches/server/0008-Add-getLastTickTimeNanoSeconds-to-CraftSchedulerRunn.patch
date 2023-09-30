@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: wangxyper <wangxyper@163.com>
+Date: Sat, 30 Sep 2023 12:29:55 +0800
+Subject: [PATCH] Add getLastTickTimeNanoSeconds to CraftSchedulerRunner
+
+
+diff --git a/src/main/java/org/era4funmc/sandfolia/thread/CraftSchedulerRunner.java b/src/main/java/org/era4funmc/sandfolia/thread/CraftSchedulerRunner.java
+index 63509c0ad111aeb506fb474044ded7deb1c4cbc7..b46792422183df3cb02cf057cf9882307c3772fd 100644
+--- a/src/main/java/org/era4funmc/sandfolia/thread/CraftSchedulerRunner.java
++++ b/src/main/java/org/era4funmc/sandfolia/thread/CraftSchedulerRunner.java
+@@ -25,6 +25,7 @@ public class CraftSchedulerRunner extends TickThread implements Executor {
+     private long lastTimeOut = 0;
+     private volatile int tickCount = 0;
+     private final Deque<Runnable> localTasks = new ConcurrentLinkedDeque<>();
++    private long lastTickTimeNanoSeconds = 0;
+ 
+     private CraftSchedulerRunner(){
+         super("Craft Scheduler Runner Thread");
+@@ -55,6 +56,7 @@ public class CraftSchedulerRunner extends TickThread implements Executor {
+                 this.doSchedulerTask();
+             }finally {
+                 final long usedTime = System.nanoTime() - currTime;
++                this.lastTickTimeNanoSeconds = usedTime;
+ 
+                 if (usedTime + lastTimeOut < fullCycle){
+                     LockSupport.parkNanos(fullCycle - usedTime);
+@@ -66,6 +68,10 @@ public class CraftSchedulerRunner extends TickThread implements Executor {
+         }
+     }
+ 
++    public long getLastTickTimeNanoSeconds(){
++        return this.lastTickTimeNanoSeconds;
++    }
++
+     protected void doSchedulerTask(){
+         //Flush tasks
+         Runnable task;
