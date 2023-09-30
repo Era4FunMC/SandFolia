@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: wangxyper <wangxyper@163.com>
+Date: Sat, 30 Sep 2023 11:24:00 +0800
+Subject: [PATCH] Paper Upstream Fix line of sight distance check
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+index c7fd5d6a4e7f5e8306b0552499c38bd5ee3a927a..3eb9a1c2f207498d9ae069f2ef12768959b4b9f4 100644
+--- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
++++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+@@ -3661,7 +3661,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+             Vec3 vec3d1 = new Vec3(entity.getX(), entity.getEyeY(), entity.getZ());
+ 
+             // Paper - diff on change - used in CraftLivingEntity#hasLineOfSight(Location) and CraftWorld#lineOfSightExists
+-            return vec3d1.distanceToSqr(vec3d) > 128.0D ? false : this.level().clipDirect(vec3d, vec3d1, net.minecraft.world.phys.shapes.CollisionContext.of(this)) == HitResult.Type.MISS; // Paper
++            return vec3d1.distanceToSqr(vec3d) > 128.0D * 128.0D ? false : this.level().clipDirect(vec3d, vec3d1, net.minecraft.world.phys.shapes.CollisionContext.of(this)) == HitResult.Type.MISS; // Paper
+         }
+     }
+ 
