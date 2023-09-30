@@ -39,13 +39,10 @@ jobs:
       with:
         name: Artifacts
         path: build/libs/
-    - name: Create Release
-      uses: ncipollo/release-action@v1.12.0
-      with:
-        artifacts: ${{ env.jar }}
-        bodyFile: ${{ env.info }}
-        tag: ${{ env.tag }}
-        name: ${{ env.name }}
-        prerelease: ${{ env.pre }}
-        token: ${{ secrets.GITHUB_TOKEN }}
-        makeLatest: ${{ env.make_latest }}
+    - name: Publish
+      run: |
+          echo "GITHUB_USERNAME=SandFolia-CI" >> $GITHUB_ENV
+          export GITHUB_USERNAME=SandFolia-CI
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+          export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          ./gradlew publish
