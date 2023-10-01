@@ -28,7 +28,7 @@ index 0000000000000000000000000000000000000000..af974e5593fbfdfde8e81fa5208e6531
 +    //
 +
 +    private static final YamlConfiguration configEntry = new YamlConfiguration();
-+    private static final File CONFIG_FILE = new File("molia.yml");
++    private static final File CONFIG_FILE = new File("sandfolia.yml");
 +    private static final Logger logger = LogManager.getLogger();
 +
 +
