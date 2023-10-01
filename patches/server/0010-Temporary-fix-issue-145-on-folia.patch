@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: wangxyper <wangxyper@163.com>
+Date: Sun, 1 Oct 2023 19:44:01 +0800
+Subject: [PATCH] Temporary fix issue #145 on folia
+
+
+diff --git a/src/main/java/io/papermc/paper/threadedregions/TickRegionScheduler.java b/src/main/java/io/papermc/paper/threadedregions/TickRegionScheduler.java
+index 1d48c38bc6aece3b7f741eb66eb05dfed51312af..ee5e755f3864b1a7403c010ab8e954c28909fc8a 100644
+--- a/src/main/java/io/papermc/paper/threadedregions/TickRegionScheduler.java
++++ b/src/main/java/io/papermc/paper/threadedregions/TickRegionScheduler.java
+@@ -199,7 +199,7 @@ public final class TickRegionScheduler {
+     public static final class TickThreadRunner extends TickThread { //DirtyMolia - force open
+ 
+         public ThreadedRegionizer.ThreadedRegion<TickRegions.TickRegionData, TickRegions.TickRegionSectionData> currentTickingRegion; //Make it public
+-        private RegionizedWorldData currentTickingWorldRegionizedData;
++        public RegionizedWorldData currentTickingWorldRegionizedData;
+         private SchedulerThreadPool.SchedulableTick currentTickingTask;
+ 
+         public TickThreadRunner(final Runnable run, final String name) {
+diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+index 678bba9d636a0eb34270a2d26b5b3d0d6d900115..82b8a9a3826f7f7cb3cb2e1889345d711945bbe5 100644
+--- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
++++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+@@ -5,6 +5,9 @@ import com.google.common.primitives.Floats;
+ import com.mojang.brigadier.ParseResults;
+ import com.mojang.brigadier.StringReader;
+ import com.mojang.logging.LogUtils;
++import io.papermc.paper.threadedregions.RegionShutdownThread;
++import io.papermc.paper.threadedregions.TickRegionScheduler;
++import io.papermc.paper.util.TickThread;
+ import it.unimi.dsi.fastutil.ints.Int2ObjectMap.Entry;
+ import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
+ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+@@ -1431,6 +1434,10 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+     @Override
+     public void handleMovePlayer(ServerboundMovePlayerPacket packet) {
+         PacketUtils.ensureRunningOnSameThread(packet, this, this.player.serverLevel());
++        if (((TickRegionScheduler.TickThreadRunner) TickThread.getCurrentTickThread()).currentTickingWorldRegionizedData.world != this.player.level()){
++            return;
++        }
++
+         if (ServerGamePacketListenerImpl.containsInvalidValues(packet.getX(0.0D), packet.getY(0.0D), packet.getZ(0.0D), packet.getYRot(0.0F), packet.getXRot(0.0F))) {
+             this.disconnect(Component.translatable("multiplayer.disconnect.invalid_player_movement"), org.bukkit.event.player.PlayerKickEvent.Cause.INVALID_PLAYER_MOVEMENT); // Paper - kick event cause
+         } else {
