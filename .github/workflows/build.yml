@@ -41,11 +41,3 @@ jobs:
         path: build/libs/
     - name: Publish
       run: ./gradlew publish -PleavesUsername=${{ secrets.REPO_USERNAME }} -PleavesPassword=${{ secrets.REPO_PASSWORD }}
-    - name: Release Artifacts
-      uses: marvinpinto/action-automatic-releases@latest
-      with:
-       title: "SandFolia 1.20.1 - #${{ env.workflow }}"
-       automatic_release_tag: "ver/1.20.1"
-       repo_token: "${{ secrets.GITHUB_TOKEN }}"
-       files: "build/libs/*.jar"
-       prerelease: false
