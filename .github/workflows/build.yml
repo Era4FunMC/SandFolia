@@ -12,10 +12,6 @@ on:
     branches: [ "ver/1.20.1" ]
   pull_request:
     branches: [ "ver/1.20.1" ]
-
-permissions:
-  contents: read
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -40,4 +36,9 @@ jobs:
         name: Artifacts
         path: build/libs/
     - name: Publish
-      run: ./gradlew publish -PleavesUsername=${{ secrets.REPO_USERNAME }} -PleavesPassword=${{ secrets.REPO_PASSWORD }}
+      run: |
+          echo "GITHUB_USERNAME=SandFoliaCI" >> $GITHUB_ENV
+          export GITHUB_USERNAME=SandFoliaCI
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+          export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          ./gradlew publish
